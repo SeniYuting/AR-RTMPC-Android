@@ -4,8 +4,6 @@
     <color name="colorPrimaryDark">@color/main_red</color>
     <color name="colorAccent">@color/main_red</color>
 
-
-
     <color name="alpha_05_white">#0DFFFFFF</color>
     <color name="alpha_10_white">#1AFFFFFF</color>
     <color name="alpha_15_white">#26FFFFFF</color>
@@ -25,7 +23,6 @@
     <color name="alpha_85_white">#D9FFFFFF</color>
     <color name="alpha_90_white">#E6FFFFFF</color>
     <color name="alpha_95_white">#F2FFFFFF</color>
-
 
     <color name="alpha_05_black">#0D000000</color>
     <color name="alpha_10_black">#1A000000</color>
@@ -47,7 +44,6 @@
     <color name="alpha_90_black">#E6000000</color>
     <color name="alpha_95_black">#F2000000</color>
 
-
     <color name="alphayiban">#50FFFFFF</color>
     <color name="huise">#999999</color>
     <color name="hint">#dddddd</color>
@@ -61,7 +57,6 @@
 
     <color name="unwatch">#ffac00</color>
     <color name="watch">#ff9b00</color>
-
 
     <color name="scan_bg">#7f000000</color>
 
@@ -105,7 +100,7 @@
     <color name="yellow">#FFFF00</color>
 
     <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color><!--黑色 -->
+    <color name="black">#000000</color>
     <color name="item_selector">#808080</color>
 
     <color name="red">#FF0000</color>

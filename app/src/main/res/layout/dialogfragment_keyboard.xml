@@ -10,7 +10,6 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!--输入模块一-->
     <LinearLayout
         android:id="@+id/ll_input_h"
         android:layout_width="match_parent"
@@ -18,38 +17,38 @@
         android:layout_alignParentBottom="true"
         android:background="@color/alpha_60_black"
         android:orientation="horizontal"
-        android:padding="8dp"
-      >
+        android:padding="8dp">
 
+        <EditText
+            android:id="@+id/edit_send_message"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="Say Something"
+            android:imeOptions="flagNoExtractUi"
+            android:maxLength="256"
+            android:paddingLeft="12dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/alpha_30_white"
+            android:textSize="@dimen/text_small_size" />
 
-            <EditText
-                android:id="@+id/edit_send_message"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@null"
-                android:hint="说两句"
-                android:imeOptions="flagNoExtractUi"
-                android:paddingLeft="12dp"
-                android:singleLine="true"
-                android:maxLength="256"
-                android:textColor="@color/white"
-                android:textColorHint="@color/alpha_30_white"
-                android:textSize="@dimen/text_small_size" />
+        <View
+            android:layout_width="0.7dp"
+            android:layout_height="25dp"
+            android:layout_gravity="center_vertical"
+            android:background="#20ffffff">
 
-            <View
-                android:layout_width="0.7dp"
-                android:layout_height="25dp"
-                android:layout_gravity="center_vertical"
-                android:background="#20ffffff"></View>
+        </View>
 
-            <Button
-                android:id="@+id/btn_send"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:text="发送"
-                android:textColor="@color/select_text_host_input"
-                android:textSize="@dimen/text_default_size" />
+        <Button
+            android:id="@+id/btn_send"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:text="Send"
+            android:textColor="@color/select_text_host_input"
+            android:textSize="@dimen/text_default_size" />
     </LinearLayout>
 </LinearLayout>

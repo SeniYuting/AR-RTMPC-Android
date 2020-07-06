@@ -1,19 +1,15 @@
 package org.ar.model;
 
-/**
- * Created by liuxiaozhong on 2017/9/24.
- */
-
 public class LineBean {
     public String peerId;
     public String name;
     public boolean isSelf;
     public boolean startAnim;
 
-    public LineBean(String peerId, String name,boolean isSelf) {
+    public LineBean(String peerId, String name, boolean isSelf) {
         this.peerId = peerId;
         this.name = name;
-        this.isSelf=isSelf;
+        this.isSelf = isSelf;
     }
 
     public boolean isStartAnim() {

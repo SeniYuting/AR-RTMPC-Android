@@ -1,8 +1,8 @@
 package org.ar.guest;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.graphics.drawable.AnimationDrawable;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -40,11 +40,11 @@ import org.json.JSONObject;
 import java.util.Set;
 
 /**
- * 音频游客界面
+ * Audio Guest Activity
  */
 public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter.OnItemChildClickListener {
     TextView tvTitle;
-    RecyclerView rvMsgList,rvLog;
+    RecyclerView rvMsgList, rvLog;
     TextView tvApplyLine;
     View viewSpace;
     TextView tvMemberNum;
@@ -59,12 +59,11 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
     private ARAudioManager mRtmpAudioManager = null;
     private LiveMessageAdapter mAdapter;
     private LogAdapter logAdapter;
-    private boolean isApplyLine = false;//是否在连麦、申请连麦
-    private boolean isLinling = false;
+    private boolean isApplyLine = false;  // is request microphone
+    private boolean isLining = false;
     private AnimationDrawable hostAnimation;
     private AudioLineAdapter audioLineAdapter;
-    private String liveId = "";
-    private String userID="guest"+(int)((Math.random()*9+1)*100000)+"";
+    private String userID = "guest" + (int) ((Math.random() * 9 + 1) * 100000) + "";
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -77,12 +76,12 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * Destroy RTMP player
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /**
-         * 销毁rtmp播放器
-         */
         if (mGuestKit != null) {
             mGuestKit.clean();
             mGuestKit = null;
@@ -94,20 +93,20 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
 
     }
 
-
     @Override
     public int getLayoutId() {
         return org.ar.rtmpc.R.layout.activity_audio_guest;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void initView(Bundle savedInstanceState) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //保持屏幕常亮
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); // Keep screen on
         viewSpace = findViewById(org.ar.rtmpc.R.id.view_space);
         mImmersionBar.titleBar(viewSpace).init();
         tvTitle = findViewById(org.ar.rtmpc.R.id.tv_title);
-        rl_log_layout=findViewById(org.ar.rtmpc.R.id.rl_log_layout);
-        rvLog=findViewById(org.ar.rtmpc.R.id.rv_log);
+        rl_log_layout = findViewById(org.ar.rtmpc.R.id.rl_log_layout);
+        rvLog = findViewById(org.ar.rtmpc.R.id.rv_log);
         rvMsgList = findViewById(org.ar.rtmpc.R.id.rv_msg_list);
         tvApplyLine = findViewById(org.ar.rtmpc.R.id.tv_apply_line);
         tvMemberNum = findViewById(org.ar.rtmpc.R.id.tv_member_num);
@@ -132,10 +131,10 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
         rvLog.setLayoutManager(new LinearLayoutManager(this));
         logAdapter.bindToRecyclerView(rvLog);
         String pullUrl = getIntent().getStringExtra("pullURL");
-        String hostName=getIntent().getStringExtra("hostName");
+        String hostName = getIntent().getStringExtra("hostName");
         tvHostName.setText(hostName);
-        liveId = getIntent().getStringExtra("liveId");
-        tvTitle.setText("房间ID：" + liveId);
+        String liveId = getIntent().getStringExtra("liveId");
+        tvTitle.setText("Room ID：" + liveId);
         mRtmpAudioManager = ARAudioManager.create(this);
         mRtmpAudioManager.start(new ARAudioManager.AudioManagerEvents() {
             @Override
@@ -155,19 +154,12 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             user.put("isHost", 0);
             user.put("userId", userID);
             user.put("nickName", ARApplication.getNickName());
-            user.put("headUrl", "www.baidu.com");
+            user.put("headUrl", "www.ebay.com");
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return user.toString();
-    }
-
-    private void onAudioManagerChangedState() {
-        // TODO(henrika): disable video if
-        // AppRTCAudioManager.AudioDevice.EARPIECE
-        // is active.
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
 
     private void ShowExitDialog() {
@@ -178,10 +170,9 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // TODO Auto-generated method stub
                 mGuestKit.hangupRTCLine();
                 isApplyLine = false;
-                isLinling = false;
+                isLining = false;
                 finishAnimActivity();
             }
         });
@@ -190,130 +181,118 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-
             }
         });
 
         build.show();
     }
 
-
-    /**
-     * 更新列表
-     *
-     * @param chatMessageBean
-     */
     private void addChatMessageList(MessageBean chatMessageBean) {
-        // 150 条 修改；
-
         if (chatMessageBean == null) {
             return;
         }
 
-        if (mAdapter.getData().size() < 150) {
-            mAdapter.addData(chatMessageBean);
-        } else {
+        if (mAdapter.getData().size() >= 150) {
             mAdapter.remove(0);
-            mAdapter.addData(chatMessageBean);
         }
+        mAdapter.addData(chatMessageBean);
         rvMsgList.smoothScrollToPosition(mAdapter.getData().size() - 1);
     }
-    public void printLog(String log){
-        Log.d("RTMPC", log);
+
+    public void printLog(String log) {
+        Log.d("RTMP", log);
         logAdapter.addData(log);
     }
 
     /**
-     * 观看直播回调信息接口
+     * RTMP player
      */
     private ARRtmpcGuestEvent mGuestListener = new ARRtmpcGuestEvent() {
 
-        /**
-         * rtmp 连接成功 视频即将播放；视频播放前的操作可以在此接口中进行操作
-         */
+        // Connect to RTMP player
         @Override
         public void onRtmpPlayerOk() {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerOk");
+                    printLog("Call onRtmpPlayerOk");
                     if (tvRtmpOk != null) {
-                        tvRtmpOk.setText("Rtmp连接成功");
+                        tvRtmpOk.setText("RTMP connected");
                     }
                 }
             });
         }
 
-        /**
-         * rtmp 开始播放 视频开始播放
-         */
+        // Start RTMP player, Live begins
         @Override
         public void onRtmpPlayerStart() {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerStart");
+                    printLog("Call onRtmpPlayerStart");
                 }
             });
         }
 
         /**
-         * rtmp 当前播放状态
-         * @param cacheTime 当前缓存时间
-         * @param curBitrate 当前播放器码流
+         * RTMP player status
+         * @param cacheTime cache time
+         * @param curBitrate current bit rate for the player stream
          */
         @Override
         public void onRtmpPlayerStatus(final int cacheTime, final int curBitrate) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerStatus cacheTime:" + cacheTime + " curBitrate:" + curBitrate);
+                    printLog("Call onRtmpPlayerStatus cacheTime:" + cacheTime + " curBitrate:" + curBitrate);
                     if (tvRtmpStatus != null) {
-                        tvRtmpStatus.setText("当前缓存时间：" + cacheTime + " ms" + "\n当前码流：" + curBitrate / 10024 / 8 + "kb/s");
+                        tvRtmpStatus.setText("Cache time: " + cacheTime + " ms" + "\nBit Rate: " + curBitrate / 10024 / 8 + "kb/s");
                     }
                 }
             });
         }
 
         /**
-         * rtmp 播放缓冲区时长
-         * @param nPercent 缓冲时间
+         * RTMP loading
+         * @param nPercent percentage
          */
         @Override
         public void onRtmpPlayerLoading(final int nPercent) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerCache  nPercent:" + nPercent);
+                    printLog("Call onRtmpPlayerCache nPercent:" + nPercent);
                 }
             });
         }
 
         /**
-         * rtmp 播放器关闭
-         * @param nCode
+         * RTMP closed
+         * @param nCode Response code
          */
         @Override
         public void onRtmpPlayerClosed(final int nCode) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerClosed  nCode:" + nCode);
+                    printLog("Call onRtmpPlayerClosed nCode:" + nCode);
                 }
             });
         }
 
 
         /**
-         * 游客RTC 状态回调
-         * @param nCode 回调响应码：0：正常；101：主播未开启直播；
+         * RTC join
+         * @param nCode Response code: [0: normal; 101: Live hasn't started]
          */
         @Override
         public void onRTCJoinLineResult(final int nCode, String s) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCJoinLineResult  nCode:" + nCode);
+                    printLog("Call onRTCJoinLineResult  nCode:" + nCode);
                     if (nCode == 0) {
                         if (tvRtcOk != null) {
                             tvRtcOk.setText(org.ar.rtmpc.R.string.str_rtc_connect_success);
@@ -333,26 +312,27 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
         }
 
         /**
-         * 游客申请连线结果
-         * @param nCode 0：申请连线成功；-1：主播拒绝连线
+         * Request microphone
+         * @param nCode 0: Success 1: Rejected
          */
         @Override
         public void onRTCApplyLineResult(final int nCode) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRTCApplyLineResult  nCode:" + nCode);
+                    printLog("Call onRTCApplyLineResult nCode:" + nCode);
                     if (nCode == 0) {
                         isApplyLine = true;
-                        tvApplyLine.setText("挂断");
-                        audioLineAdapter.addData(0, new LineBean("self", "自己", true));
-                        isLinling = true;
+                        tvApplyLine.setText("Hang UP");
+                        audioLineAdapter.addData(0, new LineBean("self", "Self", true));
+                        isLining = true;
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_hang_up_line);
                     } else if (nCode == 601) {
                         Toast.makeText(AudioGuestActivity.this, org.ar.rtmpc.R.string.str_hoster_refused, Toast.LENGTH_LONG).show();
                         isApplyLine = false;
-                        isLinling = false;
-                        tvApplyLine.setText("连麦");
+                        isLining = false;
+                        tvApplyLine.setText("Connect to Microphone");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                     }
                 }
@@ -360,34 +340,31 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
         }
 
         /**
-         * 挂断连线回调
+         * RTC hang up
          */
         @Override
         public void onRTCHangupLine() {
-            //主播连线断开
+            //Hang up
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCHangupLine ");
+                    printLog("Call onRTCHangupLine ");
                     mGuestKit.hangupRTCLine();
                     audioLineAdapter.remove(0);
                     tvApplyLine.setText(org.ar.rtmpc.R.string.str_connect_hoster);
                     tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                     isApplyLine = false;
-                    isLinling = false;
+                    isLining = false;
                 }
             });
         }
 
-
         @Override
         public void onRTCOpenRemoteVideoRender(String s, String s1, String s2, String s3) {
-
         }
 
         @Override
         public void onRTCCloseRemoteVideoRender(String s, String s1, String s2) {
-
         }
 
         @Override
@@ -395,11 +372,11 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCOpenAudioLine strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " strUserData:" + strUserData);
+                    printLog("Call onRTCOpenAudioLine strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " strUserData:" + strUserData);
                     try {
                         JSONObject jsonObject = new JSONObject(strUserData);
                         if (strLivePeerId.equals("RTMPC_Line_Hoster")) {
-//                            audioLineAdapter.addData(new LineBean(strLivePeerId, jsonObject.getString("nickName"), true));
+                            audioLineAdapter.addData(new LineBean(strLivePeerId, jsonObject.getString("nickName"), true));
                         } else {
                             audioLineAdapter.addData(new LineBean(strLivePeerId, jsonObject.getString("nickName"), false));
                         }
@@ -416,7 +393,7 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCCloseAudioLine strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId);
+                    printLog("Call onRTCCloseAudioLine strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId);
                     int index = 9;
                     for (int i = 0; i < audioLineAdapter.getData().size(); i++) {
                         if (audioLineAdapter.getItem(i).peerId.equals(strLivePeerId)) {
@@ -435,7 +412,7 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("RTMPC", "onRTCLocalAudioActive");
+                    Log.d("RTC", "onRTCLocalAudioActive");
                 }
             });
         }
@@ -445,19 +422,18 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("RTMPC", "onRTCHosterAudioActive");
+                    Log.d("RTC", "onRTCHosterAudioActive");
                 }
             });
         }
-
 
         @Override
         public void onRTCRemoteAudioActive(final String strLivePeerId, final String strUserId, final int nTime) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCAudioActive strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " nTime:" + nTime);
-                    if (strLivePeerId.equals("RTMPC_Hoster")) {//主播
+                    printLog("Call onRTCAudioActive strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " nTime:" + nTime);
+                    if (strLivePeerId.equals("RTMPC_Hoster")) { // hoster
                         ivLineAnim.setVisibility(View.VISIBLE);
                         hostAnimation.start();
                     } else {
@@ -477,61 +453,61 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCRemoteAVStatus  peerID:" + s);
+                    printLog("Call onRTCRemoteAVStatus  peerID:" + s);
                 }
             });
         }
 
         /**
-         * 主播已离开回调
-         * @param nCode
+         * Host leave room
+         * @param nCode nCode
          */
         @Override
         public void onRTCLineLeave(final int nCode, String s) {
-            //主播关闭直播
+            //host leave room
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCLineLeave nCode:" + nCode);
+                    printLog("Call onRTCLineLeave nCode:" + nCode);
                     if (mGuestKit != null) {
                         mGuestKit.stopRtmpPlay();
                     }
                     finishAnimActivity();
-                    ToastUtil.show("主播已离开");
+                    ToastUtil.show("Host leaves");
                 }
             });
         }
 
-
         /**
-         * 消息回调
-         * @param strCustomID 消息的发送者id
-         * @param strCustomName 消息的发送者昵称
-         * @param strCustomHeader 消息的发送者头像url
-         * @param strMessage 消息内容
+         * User message
+         * @param strCustomID sender id
+         * @param strCustomName sender name
+         * @param strCustomHeader sender profile url
+         * @param strMessage message
          */
         @Override
         public void onRTCUserMessage(final int nType, final String strCustomID, final String strCustomName, final String strCustomHeader, final String strMessage) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCUserMessage nType:" + nType + "strCustomID:" + strCustomID + "strCustomName:" + strCustomName + "strCustomHeader:" + strCustomHeader + "strMessage:" + strMessage);
+                    printLog("Call onRTCUserMessage nType:" + nType + "strCustomID:" + strCustomID + "strCustomName:" + strCustomName + "strCustomHeader:" + strCustomHeader + "strMessage:" + strMessage);
                     addChatMessageList(new MessageBean(MessageBean.AUDIO, strCustomName, strMessage));
                 }
             });
         }
 
         /**
-         * 观看直播的总人数回调
-         * @param totalMembers 观看直播的总人数
+         * Number of people watching live
+         * @param totalMembers number of people
          */
         @Override
         public void onRTCMemberNotify(final String strServerId, final String strRoomId, final int totalMembers) {
             AudioGuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRTCMemberNotify strServerId:" + strServerId + "strRoomId:" + strRoomId + "totalMembers:" + totalMembers);
-                    tvMemberNum.setText("在线观看人数" + totalMembers + "");
+                    printLog("Call onRTCMemberNotify strServerId:" + strServerId + "strRoomId:" + strRoomId + "totalMembers:" + totalMembers);
+                    tvMemberNum.setText("Audience: " + totalMembers + "");
                 }
             });
         }
@@ -539,10 +515,11 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
 
     };
 
+    @SuppressLint("SetTextI18n")
     public void onClick(View view) {
         switch (view.getId()) {
             case org.ar.rtmpc.R.id.btn_close:
-                if (isLinling) {
+                if (isLining) {
                     ShowExitDialog();
                 } else {
                     finishAnimActivity();
@@ -555,21 +532,21 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
                 if (isApplyLine) {
                     if (mGuestKit != null) {
                         mGuestKit.hangupRTCLine();
-                        if (isLinling){
+                        if (isLining) {
                             audioLineAdapter.remove(0);
                         }
-                        tvApplyLine.setText("连麦");
+                        tvApplyLine.setText("Connect to Microphone");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                         isApplyLine = false;
-                        isLinling = false;
+                        isLining = false;
                     }
                 } else {
                     if (mGuestKit != null) {
                         mGuestKit.applyRTCLine();
-                        tvApplyLine.setText("挂断");
+                        tvApplyLine.setText("Hang UP");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_hang_up_line);
                         isApplyLine = true;
-                        isLinling = false;
+                        isLining = false;
                     }
                 }
                 break;
@@ -598,7 +575,6 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
         });
     }
 
-
     @Override
     public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
         switch (view.getId()) {
@@ -607,10 +583,10 @@ public class AudioGuestActivity extends BaseActivity implements BaseQuickAdapter
 
                     mGuestKit.hangupRTCLine();
                     tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
-                    tvApplyLine.setText("连麦");
+                    tvApplyLine.setText("Connect to Microphone");
                     audioLineAdapter.remove(0);
                     isApplyLine = false;
-                    isLinling = false;
+                    isLining = false;
                 }
                 break;
         }

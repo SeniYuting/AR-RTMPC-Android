@@ -2,7 +2,6 @@ package org.ar.guest;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -41,15 +40,15 @@ import org.webrtc.VideoRenderer;
 import java.util.Set;
 
 /**
- * 视频游客页面
+ * Guest Activity
  */
 public class GuestActivity extends BaseActivity {
-    RelativeLayout rlRtmpcVideos,rl_log_layout;
+    RelativeLayout rlRtmpcVideos, rl_log_layout;
     TextView tvTitle;
     TextView tvRtmpOk;
     TextView tvRtmpStatus;
     TextView tvRtcOk;
-    RecyclerView rvMsgList,rvLog;
+    RecyclerView rvMsgList, rvLog;
     TextView tvApplyLine;
     View viewSpace;
     TextView tvMemberNum;
@@ -59,10 +58,10 @@ public class GuestActivity extends BaseActivity {
     private ARAudioManager mRtmpAudioManager = null;
     private LiveMessageAdapter mAdapter;
     private LogAdapter logAdapter;
-    private boolean isApplyLine = false;//是否申请连麦
-    private boolean isLining = false;//是否正在连麦
-    private String liveId = "";
-    private String userId="guest"+(int)((Math.random()*9+1)*100000)+"";
+    private boolean isApplyLine = false;    //is request microphone
+    private boolean isLining = false;   //is lining
+    private String userId = "guest" + (int) ((Math.random() * 9 + 1) * 100000) + "";
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -83,9 +82,6 @@ public class GuestActivity extends BaseActivity {
 
         }
 
-        /**
-         * 销毁rtmp播放器
-         */
         if (mGuestKit != null) {
             mGuestKit.clean();
             mVideoView.removeLocalVideoRender();
@@ -100,26 +96,27 @@ public class GuestActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); //保持屏幕常亮
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
     }
 
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void initView(Bundle savedInstanceState) {
-        viewSpace=findViewById(org.ar.rtmpc.R.id.view_space);
+        viewSpace = findViewById(org.ar.rtmpc.R.id.view_space);
         mImmersionBar.titleBar(viewSpace).init();
-        ibtnCamera=findViewById(org.ar.rtmpc.R.id.btn_camare);
-        rlRtmpcVideos=findViewById(org.ar.rtmpc.R.id.rl_rtmpc_videos);
-        rl_log_layout=findViewById(org.ar.rtmpc.R.id.rl_log_layout);
-        rvLog=findViewById(org.ar.rtmpc.R.id.rv_log);
-        tvTitle=findViewById(org.ar.rtmpc.R.id.tv_title);
-        tvRtmpOk=findViewById(org.ar.rtmpc.R.id.tv_rtmp_ok);
-        tvRtmpStatus=findViewById(org.ar.rtmpc.R.id.tv_rtmp_status);
-        tvRtcOk=findViewById(org.ar.rtmpc.R.id.tv_rtc_ok);
-        rvMsgList=findViewById(org.ar.rtmpc.R.id.rv_msg_list);
-        tvApplyLine=findViewById(org.ar.rtmpc.R.id.tv_apply_line);
-        tvMemberNum=findViewById(org.ar.rtmpc.R.id.tv_member_num);
+        ibtnCamera = findViewById(org.ar.rtmpc.R.id.btn_camare);
+        rlRtmpcVideos = findViewById(org.ar.rtmpc.R.id.rl_rtmpc_videos);
+        rl_log_layout = findViewById(org.ar.rtmpc.R.id.rl_log_layout);
+        rvLog = findViewById(org.ar.rtmpc.R.id.rv_log);
+        tvTitle = findViewById(org.ar.rtmpc.R.id.tv_title);
+        tvRtmpOk = findViewById(org.ar.rtmpc.R.id.tv_rtmp_ok);
+        tvRtmpStatus = findViewById(org.ar.rtmpc.R.id.tv_rtmp_status);
+        tvRtcOk = findViewById(org.ar.rtmpc.R.id.tv_rtc_ok);
+        rvMsgList = findViewById(org.ar.rtmpc.R.id.rv_msg_list);
+        tvApplyLine = findViewById(org.ar.rtmpc.R.id.tv_apply_line);
+        tvMemberNum = findViewById(org.ar.rtmpc.R.id.tv_member_num);
 
         logAdapter = new LogAdapter();
         rvLog.setLayoutManager(new LinearLayoutManager(this));
@@ -130,22 +127,20 @@ public class GuestActivity extends BaseActivity {
         ARRtmpcEngine.Inst().getGuestOption().setDefaultFrontCamera(true);
         ARRtmpcEngine.Inst().getGuestOption().setMediaType(ARVideoCommon.ARMediaType.Video);
         String pullUrl = getIntent().getStringExtra("pullURL");
-        liveId = getIntent().getStringExtra("liveId");
-        tvTitle.setText("房间ID:" +liveId);
-        mVideoView = new ARVideoView( rlRtmpcVideos, ARRtmpcEngine.Inst().egl(), this,false, false);
+        String liveId = getIntent().getStringExtra("liveId");
+        tvTitle.setText("Room ID:" + liveId);
+        mVideoView = new ARVideoView(rlRtmpcVideos, ARRtmpcEngine.Inst().egl(), this, false, false);
         mVideoView.setVideoViewLayout(false, Gravity.RIGHT, LinearLayout.VERTICAL);
         mVideoView.setVideoLayoutOnclickEvent(new ARVideoView.VideoLayoutOnclickEvent() {
             @Override
             public void onCloseVideoRender(View view, String strPeerId) {
-                /**
-                 * 挂断连线
-                 */
+                // hang up
                 mGuestKit.hangupRTCLine();
                 mVideoView.removeRemoteRender("LocalCameraRender");
                 tvApplyLine.setText(org.ar.rtmpc.R.string.str_connect_hoster);
                 tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                 isApplyLine = false;
-                isLining=false;
+                isLining = false;
             }
         });
         mRtmpAudioManager = ARAudioManager.create(this);
@@ -170,18 +165,11 @@ public class GuestActivity extends BaseActivity {
             user.put("isHost", 0);
             user.put("userId", userId);
             user.put("nickName", ARApplication.getNickName());
-            user.put("headUrl", "www.baidu.com");
+            user.put("headUrl", "www.ebay.com");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return user.toString();
-    }
-
-    private void onAudioManagerChangedState() {
-        // TODO(henrika): disable video if
-        // AppRTCAudioManager.AudioDevice.EARPIECE
-        // is active.
-        setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
     }
 
     private void ShowExitDialog() {
@@ -192,33 +180,23 @@ public class GuestActivity extends BaseActivity {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // TODO Auto-generated method stub
                 mGuestKit.hangupRTCLine();
                 mVideoView.removeRemoteRender("LocalCameraRender");
                 finishAnimActivity();
             }
         });
-        build.setNegativeButton(org.ar.rtmpc.R.string.str_cancel, new DialogInterface.OnClickListener() {
 
+        build.setNegativeButton(org.ar.rtmpc.R.string.str_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
-
             }
         });
 
         build.show();
     }
 
-
-    /**
-     * 更新列表
-     *
-     * @param chatMessageBean
-     */
     private void addChatMessageList(MessageBean chatMessageBean) {
-        // 150 条 修改；
-
         if (chatMessageBean == null) {
             return;
         }
@@ -232,103 +210,101 @@ public class GuestActivity extends BaseActivity {
         rvMsgList.smoothScrollToPosition(mAdapter.getData().size() - 1);
     }
 
-    public void printLog(String log){
-        Log.d("RTMPC", log);
+    public void printLog(String log) {
+        Log.d("RTMP", log);
         logAdapter.addData(log);
     }
 
     /**
-     * 观看直播回调信息接口
+     * RTMP player
      */
     private ARRtmpcGuestEvent mGuestListener = new ARRtmpcGuestEvent() {
 
         /**
-         * rtmp 连接成功 视频即将播放；视频播放前的操作可以在此接口中进行操作
+         * RTMP connected
          */
         @Override
         public void onRtmpPlayerOk() {
             GuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerOk");
+                    printLog("Call onRtmpPlayerOk");
                     if (tvRtmpOk != null) {
-                        tvRtmpOk.setText("Rtmp连接成功");
+                        tvRtmpOk.setText("RTMP connected");
                     }
                 }
             });
         }
 
-        /**
-         * rtmp 开始播放 视频开始播放
-         */
+        // Start RTMP player, Live begins
         @Override
         public void onRtmpPlayerStart() {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerStart");
+                    printLog("Call onRtmpPlayerStart");
                 }
             });
         }
 
         /**
-         * rtmp 当前播放状态
-         * @param cacheTime 当前缓存时间
-         * @param curBitrate 当前播放器码流
+         * RTMP player status
+         * @param cacheTime cache time
+         * @param curBitrate current bit rate for the player stream
          */
         @Override
         public void onRtmpPlayerStatus(final int cacheTime, final int curBitrate) {
             GuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerStatus cacheTime:" + cacheTime + " curBitrate:" + curBitrate);
+                    printLog("Call onRtmpPlayerStatus cacheTime:" + cacheTime + " curBitrate:" + curBitrate);
                     if (tvRtmpStatus != null) {
-                        tvRtmpStatus.setText("当前缓存时间：" + cacheTime + " ms" + "\n当前码流：" + curBitrate / 10024 / 8 + "kb/s");
+                        tvRtmpStatus.setText("Cache time: " + cacheTime + " ms" + "\nBit Rate: " + curBitrate / 10024 / 8 + "kb/s");
                     }
-
                 }
             });
         }
 
         /**
-         * rtmp 播放缓冲区时长
-         * @param nPercent 缓冲时间
+         * RTMP player loading
+         * @param nPercent percentage
          */
         @Override
         public void onRtmpPlayerLoading(final int nPercent) {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerCache  nPercent:" + nPercent);
+                    printLog("Call onRtmpPlayerCache  nPercent:" + nPercent);
                 }
             });
         }
 
         /**
-         * rtmp 播放器关闭
-         * @param nCode
+         * RTMP closed
+         * @param nCode Response code
          */
         @Override
         public void onRtmpPlayerClosed(final int nCode) {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRtmpPlayerClosed  nCode:" + nCode);
+                    printLog("Call onRtmpPlayerClosed  nCode:" + nCode);
                 }
             });
         }
 
-
         /**
-         * 游客RTC 状态回调
-         * @param nCode 回调响应码：0：正常；101：主播未开启直播；
+         * Guest RTC join
+         * @param nCode Response code: [0: normal; 101: Live hasn't started]
          */
         @Override
         public void onRTCJoinLineResult(final int nCode, String s) {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCJoinLineResult  nCode:" + nCode);
+                    printLog("Call onRTCJoinLineResult  nCode:" + nCode);
                     if (tvRtcOk != null) {
                         if (nCode == 0) {
                             tvRtcOk.setText(org.ar.rtmpc.R.string.str_rtc_connect_success);
@@ -344,20 +320,20 @@ public class GuestActivity extends BaseActivity {
         }
 
         /**
-         * 游客申请连线回调
+         * Request microphone
          */
         @Override
         public void onRTCApplyLineResult(final int nCode) {
             GuestActivity.this.runOnUiThread(new Runnable() {
-                @SuppressLint("MissingPermission")
+                @SuppressLint({"MissingPermission", "SetTextI18n"})
                 @Override
                 public void run() {
-                    printLog("回调：onRTCApplyLineResult  nCode:" + nCode);
+                    printLog("Call onRTCApplyLineResult  nCode:" + nCode);
                     if (nCode == 0) {
                         ibtnCamera.setVisibility(View.VISIBLE);
                         isApplyLine = true;
                         isLining = true;
-                        tvApplyLine.setText("挂断");
+                        tvApplyLine.setText("Hang UP");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_hang_up_line);
                         VideoRenderer render = mVideoView.openRemoteVideoRender("LocalCameraRender");
                         mGuestKit.setLocalVideoCapturer(render.GetRenderPointer());
@@ -365,24 +341,23 @@ public class GuestActivity extends BaseActivity {
                         Toast.makeText(GuestActivity.this, org.ar.rtmpc.R.string.str_hoster_refused, Toast.LENGTH_LONG).show();
                         isApplyLine = false;
                         ibtnCamera.setVisibility(View.GONE);
-                        tvApplyLine.setText("连麦");
+                        tvApplyLine.setText("Connect to Microphone");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                     }
                 }
             });
         }
 
-
         /**
-         * 挂断连线回调
+         * RTC hang up
          */
         @Override
         public void onRTCHangupLine() {
-            //主播连线断开
+            //host hang up
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCHangupLine ");
+                    printLog("Call onRTCHangupLine ");
                     mGuestKit.hangupRTCLine();
                     ibtnCamera.setVisibility(View.GONE);
                     mVideoView.removeRemoteRender("LocalCameraRender");
@@ -400,7 +375,7 @@ public class GuestActivity extends BaseActivity {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCOpenVideoRenderLeave strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " strUserData:" + strUserData);
+                    printLog("Call onRTCOpenVideoRenderLeave strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId + " strUserData:" + strUserData);
                     final VideoRenderer render = mVideoView.openRemoteVideoRender(strLivePeerId);
                     mGuestKit.setRTCRemoteVideoRender(strPublishId, render.GetRenderPointer());
                 }
@@ -412,8 +387,8 @@ public class GuestActivity extends BaseActivity {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("RTMPC", "onRTCCloseVideoRender strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId);
-                    if (mGuestKit != null && mVideoView != null ) {
+                    Log.d("RTC", "onRTCCloseVideoRender strLivePeerId:" + strLivePeerId + "strUserId:" + strUserId);
+                    if (mGuestKit != null && mVideoView != null) {
                         mGuestKit.setRTCRemoteVideoRender(strPublishId, 0);
                         mVideoView.removeRemoteRender(strLivePeerId);
                     }
@@ -436,7 +411,7 @@ public class GuestActivity extends BaseActivity {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("RTMPC", "onRTCLocalAudioActive  ");
+                    Log.d("RTC", "onRTCLocalAudioActive  ");
                 }
             });
         }
@@ -446,18 +421,17 @@ public class GuestActivity extends BaseActivity {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("RTMPC", "onRTCHosterAudioActive  ");
+                    Log.d("RTC", "onRTCHosterAudioActive  ");
                 }
             });
         }
-
 
         @Override
         public void onRTCRemoteAudioActive(final String s, String s1, int i) {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCRemoteAudioActive  peerID:" + s);
+                    printLog("Call onRTCRemoteAudioActive peerID:" + s);
                 }
             });
         }
@@ -467,29 +441,29 @@ public class GuestActivity extends BaseActivity {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCRemoteAVStatus  peerID:" + s);
+                    printLog("Call onRTCRemoteAVStatus peerID:" + s);
                 }
             });
         }
 
         /**
-         * 主播已离开回调
-
+         * Host leave room
+         * @param nCode nCode
          */
         @Override
         public void onRTCLineLeave(final int nCode, String s) {
-            //主播关闭直播
+            //host close
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCLineLeave nCode:" + nCode);
+                    printLog("Call onRTCLineLeave nCode:" + nCode);
                     if (mGuestKit != null) {
                         mGuestKit.stopRtmpPlay();
                     }
                     if (nCode == 0) {
-                        ToastUtil.show("主播已离开");
+                        ToastUtil.show("Host leaves");
                     } else if (nCode == 100) {
-                        ToastUtil.show("网络已断开");
+                        ToastUtil.show("Network Disconnected");
                     }
                     finishAnimActivity();
                 }
@@ -497,56 +471,43 @@ public class GuestActivity extends BaseActivity {
         }
 
         /**
-         * 连线接通后回调
-         * @param strLivePeerId
-         */
-
-
-        /**
-         * 连线关闭后图像回调
-         * @param strLivePeerId
-         */
-
-
-        /**
-         * 消息回调
-         * @param strCustomID 消息的发送者id
-         * @param strCustomName 消息的发送者昵称
-         * @param strCustomHeader 消息的发送者头像url
-         * @param strMessage 消息内容
+         * User message
+         * @param strCustomID sender id
+         * @param strCustomName sender name
+         * @param strCustomHeader sender profile url
+         * @param strMessage message
          */
         @Override
         public void onRTCUserMessage(final int nType, final String strCustomID, final String strCustomName, final String strCustomHeader, final String strMessage) {
             GuestActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    printLog("回调：onRTCUserMessage nType:" + nType + "strCustomID:" + strCustomID + "strCustomName:" + strCustomName + "strCustomHeader:" + strCustomHeader + "strMessage:" + strMessage);
+                    printLog("Call onRTCUserMessage nType:" + nType + "strCustomID:" + strCustomID + "strCustomName:" + strCustomName + "strCustomHeader:" + strCustomHeader + "strMessage:" + strMessage);
                     addChatMessageList(new MessageBean(MessageBean.VIDEO, strCustomName, strMessage));
                 }
             });
         }
 
         /**
-         * 观看直播的总人数回调
-         * @param totalMembers 观看直播的总人数
+         * Number of people watching live
+         * @param totalMembers number of people
          */
         @Override
         public void onRTCMemberNotify(final String strServerId, final String strRoomId, final int totalMembers) {
             GuestActivity.this.runOnUiThread(new Runnable() {
+                @SuppressLint("SetTextI18n")
                 @Override
                 public void run() {
                     printLog("回调：onRTCMemberNotify strServerId:" + strServerId + "strRoomId:" + strRoomId + "totalMembers:" + totalMembers);
                     if (tvMemberNum != null) {
-                        tvMemberNum.setText("在线人数" + totalMembers + "");
+                        tvMemberNum.setText("Audience: " + totalMembers + "");
                     }
-
-
                 }
             });
         }
-
     };
 
+    @SuppressLint("SetTextI18n")
     public void onClick(View view) {
         switch (view.getId()) {
             case org.ar.rtmpc.R.id.btn_close:
@@ -563,7 +524,7 @@ public class GuestActivity extends BaseActivity {
                 if (isApplyLine) {
                     if (mGuestKit != null) {
                         mGuestKit.hangupRTCLine();
-                        tvApplyLine.setText("连麦");
+                        tvApplyLine.setText("Connect to Microphone");
                         ibtnCamera.setVisibility(View.GONE);
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_apply_line);
                         mVideoView.removeRemoteRender("LocalCameraRender");
@@ -572,7 +533,7 @@ public class GuestActivity extends BaseActivity {
                 } else {
                     if (mGuestKit != null) {
                         mGuestKit.applyRTCLine();
-                        tvApplyLine.setText("挂断");
+                        tvApplyLine.setText("Hang UP");
                         tvApplyLine.setBackgroundResource(org.ar.rtmpc.R.drawable.shape_room_hang_up_line);
                         isApplyLine = true;
                     }
@@ -605,5 +566,4 @@ public class GuestActivity extends BaseActivity {
             }
         });
     }
-
 }

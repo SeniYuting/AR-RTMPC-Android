@@ -2,37 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-  >
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#FFFFFF"
         android:gravity="center_vertical"
         android:padding="12dp"
-        android:textColor="#333333"
-        android:background="#FFFFFF"
-        android:text="连麦列表"
-        />
+        android:text="List of Connected Microphones"
+        android:textColor="#333333" />
 
     <View
-        android:background="@color/line"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"></View>
+        android:layout_height="0.5dp"
+        android:background="@color/line">
+
+    </View>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#F6F8F9">
 
+        </android.support.v7.widget.RecyclerView>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
-        android:background="#F6F8F9"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-       ></android.support.v7.widget.RecyclerView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

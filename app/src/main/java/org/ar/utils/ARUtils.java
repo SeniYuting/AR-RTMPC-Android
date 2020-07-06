@@ -3,34 +3,23 @@ package org.ar.utils;
 import org.ar.ARApplication;
 import org.ar.rtmpc.R;
 
-/**
- * Created by Skyline on 2016/11/1.
- */
-
 public enum ARUtils {
-    AnyRTC_OK(0),               // 正常
-    AnyRTC_UNKNOW(1),           // 未知错误
-    AnyRTC_EXCEPTION(2),	    // SDK调用异常
+    AnyRTC_OK(0),
+    AnyRTC_UNKNOW(1),
+    AnyRTC_EXCEPTION(2),
 
 
-    AnyRTC_NET_ERR(100),		// 网络错误
-    AnyRTC_NET_DISSCONNECT(101),	// 网络断开
-    AnyRTC_LIVE_ERR(101),		// 直播出错
+    AnyRTC_NET_ERR(100),
+    AnyRTC_LIVE_ERR(101),
 
 
-
-    AnyRTC_BAD_REQ(201),		// 服务不支持的错误请求
-    AnyRTC_AUTH_FAIL(202),		// 认证失败
-    AnyRTC_NO_USER(203),		// 此开发者信息不存在
-    AnyRTC_SQL_ERR(204),		// 服务器内部数据库错误
-    AnyRTC_ARREARS(205),		// 账号欠费
-    AnyRTC_LOCKED(206),		    // 账号被锁定
-    AnyRTC_FORCE_EXIT(207),    // 强制离开
-    AnyRTC_ID_INVALIDE(208),	// AnyRTC ID非法(仅会议和RTCP中检测)
-    AnyRTC_SERVICE_CLOSED (209),// 服务未开通
-    AnyRTC_BUNDLE_ID_ERR (210),	// Bundle ID不匹配
-    AnyRTC_PUB_GONE (211),		// 订阅的PubID已过期
-    AnyRTC_NO_RTC_SVR(212);	// 没有RTC服务器
+    AnyRTC_BAD_REQ(201),
+    AnyRTC_AUTH_FAIL(202),
+    AnyRTC_NO_USER(203),
+    AnyRTC_SQL_ERR(204),
+    AnyRTC_ARREARS(205),
+    AnyRTC_LOCKED(206),
+    AnyRTC_FORCE_EXIT(207);
 
     private int value;
 
@@ -43,9 +32,9 @@ public enum ARUtils {
     }
 
     /**
-     * 根据错误码获取文字描述
-     * @param value
-     * @return
+     * Get error string
+     *
+     * @param value value
      */
     public static String getErrString(int value) {
         if (value == AnyRTC_OK.getValue()) {

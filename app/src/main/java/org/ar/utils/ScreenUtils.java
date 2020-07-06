@@ -10,24 +10,12 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 
-/**
- * Get screen associated auxiliary class
- *
- * @author Ming <br/>
- */
 public class ScreenUtils {
     private ScreenUtils() {
         /* cannot be instantiated */
         throw new UnsupportedOperationException("cannot be instantiated");
     }
 
-    /**
-     * dip to px
-     *
-     * @param dip
-     * @param context
-     * @return
-     */
     public static float dip2Dimension(float dip, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, displayMetrics);
@@ -38,23 +26,11 @@ public class ScreenUtils {
                 paramResources.getDisplayMetrics());
     }
 
-    /**
-     * @param context
-     * @param complexUnit {@link TypedValue#COMPLEX_UNIT_DIP}
-     *                    {@link TypedValue#COMPLEX_UNIT_SP}
-     * @return
-     */
     public static float toDimension(float dip, Context context, int complexUnit) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return TypedValue.applyDimension(complexUnit, dip, displayMetrics);
     }
 
-    /**
-     * Get screen width
-     *
-     * @param context
-     * @return
-     */
     public static int getScreenWidth(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -63,12 +39,6 @@ public class ScreenUtils {
         return outMetrics.widthPixels;
     }
 
-    /**
-     * Get screen height
-     *
-     * @param context
-     * @return
-     */
     public static int getScreenHeight(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics outMetrics = new DisplayMetrics();
@@ -76,12 +46,6 @@ public class ScreenUtils {
         return outMetrics.heightPixels;
     }
 
-
-    /**
-     * 判断是否为平板
-     *
-     * @return
-     */
     public static boolean isPad(Context context) {
 
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
@@ -93,7 +57,7 @@ public class ScreenUtils {
 
         int dens = dm.densityDpi;
         double screenInches = diagonal / (double) dens;
-        // 大于6尺寸则为Pad
+
         if (screenInches >= 6.0) {
             return true;
         }
@@ -101,12 +65,6 @@ public class ScreenUtils {
 
     }
 
-    /**
-     * 获得状态栏的高度
-     *
-     * @param context
-     * @return
-     */
     public static int getStatusHeight(Context context) {
 
         int statusHeight = -1;
@@ -121,12 +79,6 @@ public class ScreenUtils {
         return statusHeight;
     }
 
-    /**
-     * 获取当前屏幕截图，包含状态栏
-     *
-     * @param activity
-     * @return
-     */
     public static Bitmap snapShotWithStatusBar(Activity activity) {
         View view = activity.getWindow().getDecorView();
         view.setDrawingCacheEnabled(true);
@@ -141,12 +93,6 @@ public class ScreenUtils {
 
     }
 
-    /**
-     * 获取当前屏幕截图，不包含状态栏
-     *
-     * @param activity
-     * @return
-     */
     public static Bitmap snapShotWithoutStatusBar(Activity activity) {
         View view = activity.getWindow().getDecorView();
         view.setDrawingCacheEnabled(true);
@@ -162,7 +108,6 @@ public class ScreenUtils {
         bp = Bitmap.createBitmap(bmp, 0, statusBarHeight, width, height - statusBarHeight);
         view.destroyDrawingCache();
         return bp;
-
     }
 
     public static final int getHeightInPx(Context context) {
@@ -206,6 +151,4 @@ public class ScreenUtils {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (spValue * scale + 0.5f);
     }
-
-
 }

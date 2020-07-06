@@ -8,12 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.gyf.barlibrary.ImmersionBar;
 
-/**
- * Created by Skyline on 2016/5/24.
- */
 public abstract class BaseActivity extends AppCompatActivity {
     protected ImmersionBar mImmersionBar;
     ProgressDialog pd;
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -24,9 +22,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         this.setContentView(this.getLayoutId());
         mImmersionBar = ImmersionBar.with(this);
-        mImmersionBar.statusBarDarkFont(true,0.2f).init();
+        mImmersionBar.statusBarDarkFont(true, 0.2f).init();
         this.initView(savedInstanceState);
     }
+
     private void ProgressDialog(Context ctx) {
         pd = new ProgressDialog(ctx);
         pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -34,11 +33,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         pd.setCanceledOnTouchOutside(false);
         pd.show();
     }
+
     public void showProgressDialog() {
         if (pd == null) {
             ProgressDialog(this);
         }
-        pd.setMessage("正在加载...");
+        pd.setMessage("Loading ...");
         pd.show();
     }
 
@@ -60,7 +60,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
     }
-
 
     public void startAnimActivity(Class<?> cls) {
         startActivity(new Intent(this, cls));

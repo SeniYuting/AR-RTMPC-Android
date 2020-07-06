@@ -2,11 +2,7 @@ package org.ar.model;
 
 import java.io.Serializable;
 
-/**
- * Created by liuxiaozhong on 2017-09-22.
- */
-
-public class LiveBean implements Serializable{
+public class LiveBean implements Serializable {
 
     public String mRtmpPullUrl;
     public String mHlsUrl;
@@ -17,7 +13,7 @@ public class LiveBean implements Serializable{
     public int isLiveLandscape;
     public int liveMode;
     public String mHostName;
-    public String mMemberNum="";
+    public String mMemberNum = "";
 
     public String getmRtmpPullUrl() {
         return mRtmpPullUrl;

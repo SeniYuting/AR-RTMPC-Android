@@ -11,7 +11,7 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startActivity(new Intent(this,LiveListActivity.class));
+        startActivity(new Intent(this, LiveListActivity.class));
         finish();
     }
 }

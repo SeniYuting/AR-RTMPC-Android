@@ -8,9 +8,6 @@ import android.widget.Toast;
 
 import org.ar.ARApplication;
 
-/**
- * Created by Skyline on 2016/5/24.
- */
 public class ToastUtil {
     private static Context context = ARApplication.App();
     private static Toast mToast;

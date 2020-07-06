@@ -32,7 +32,6 @@
 -keep public class * extends android.content.ContentProvider
 -keep public class * extends android.app.backup.BackupAgentHelper
 -keep public class * extends android.preference.Preference
--keep public class com.android.vending.licensing.ILicensingService
 
 
 -keepclasseswithmembernames class * {
@@ -63,10 +62,6 @@
     public static ** valueOf(java.lang.String);
 }
 
--keep class * implements android.os.Parcelable {
-    public static final android.os.Parcelable$Creator *;
-}
-
 -keepnames class * implements java.io.Serializable
 
 -keepclassmembers class * implements java.io.Serializable {
@@ -83,33 +78,4 @@
 -keepattributes Exceptions,InnerClasses,Signature
 -keepattributes SourceFile,LineNumberTable
 
--keep class **.R$* { *; }
--dontwarn android.support.v4.**
--keep class android.support.v4.** { *; }
--keep interface android.support.v4.** { *; }
--keep public class * extends android.support.v4.**
--keep public class * extends android.app.Fragment
-
--keep class org.anyrtc.model.** { *; }
-
-
-#anyrtc
--dontwarn org.anyrtc.rtmpc_hybrid.**
--keep class org.anyrtc.rtmpc_hybrid.**{*;}
--dontwarn org.webrtc.**
--keep class org.webrtc.**{*;}
-
-
  -keep class com.gyf.barlibrary.* {*;}
-
-  #Andprermission
- -keepclassmembers class ** {
-     @com.yanzhenjie.permission.PermissionYes <methods>;
- }
- -keepclassmembers class ** {
-     @com.yanzhenjie.permission.PermissionNo <methods>;
- }
- #BaseAdapter
- -keep class com.chad.library.adapter.** {
-    *;
- }

@@ -17,7 +17,6 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-
     <application
         android:name="org.ar.ARApplication"
         android:allowBackup="true"
@@ -44,9 +43,10 @@
         <activity
             android:name="org.ar.guest.LiveListActivity"
             android:screenOrientation="portrait" />
-        <activity android:name="org.ar.SplashActivity"
-            android:theme="@style/SplashTheme"
-            android:screenOrientation="portrait">
+        <activity
+            android:name="org.ar.SplashActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

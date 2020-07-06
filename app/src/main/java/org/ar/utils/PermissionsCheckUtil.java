@@ -11,18 +11,17 @@ import android.provider.Settings;
 public class PermissionsCheckUtil {
 
     public static final int SETTING_APP = 0x123;
-    private static String TAG = "PermissionsCheckUtil";
-    private static String[] PHONE_MTYB = new String[]{"sanxing", "xiaomi"};
+    private static String[] PHONE_MTYB = new String[]{"huawei", "sanxing", "xiaomi"};
 
     /**
-     * @param activity
-     * @param message  显示缺失权限提示说明
+     * @param activity activity
+     * @param message  hint message
      */
     public static void showMissingPermissionDialog(final Activity activity, String message) {
         boolean canSetting = false;
-        String mtyb = Build.BRAND;//手机品牌
+        String mtyb = Build.BRAND;
         for (int i = 0; i < PHONE_MTYB.length; i++) {
-            if (PHONE_MTYB[i].equalsIgnoreCase(mtyb)) {//相等可以调用到设置界面进行权限设置
+            if (PHONE_MTYB[i].equalsIgnoreCase(mtyb)) {
                 canSetting = true;
                 break;
             } else {
@@ -30,10 +29,10 @@ public class PermissionsCheckUtil {
             }
         }
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("帮助");
+        builder.setTitle("Help");
         builder.setMessage(message);
         if (canSetting) {
-            builder.setPositiveButton("设置", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -42,7 +41,7 @@ public class PermissionsCheckUtil {
                 }
             });
         }
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -52,7 +51,6 @@ public class PermissionsCheckUtil {
         builder.show();
     }
 
-    // 启动应用的设置
     public static void startAppSettings(Activity activity) {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:" + activity.getPackageName()));
