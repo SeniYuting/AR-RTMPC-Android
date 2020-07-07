@@ -13,11 +13,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.yanzhenjie.nohttp.NoHttp;
-import com.yanzhenjie.nohttp.RequestMethod;
-import com.yanzhenjie.nohttp.rest.Response;
-import com.yanzhenjie.nohttp.rest.SimpleResponseListener;
-import com.yanzhenjie.nohttp.rest.StringRequest;
 import com.yanzhenjie.permission.AndPermission;
 import com.yanzhenjie.permission.runtime.Permission;
 

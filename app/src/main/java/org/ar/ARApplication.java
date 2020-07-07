@@ -2,9 +2,6 @@ package org.ar;
 
 import android.app.Application;
 
-import com.yanzhenjie.nohttp.InitializationConfig;
-import com.yanzhenjie.nohttp.NoHttp;
-
 import org.ar.utils.NameUtils;
 import org.ar.rtmpc_hybrid.ARRtmpcEngine;
 
@@ -23,13 +20,6 @@ public class ARApplication extends Application {
         mARApplication =this;
         NickName= NameUtils.getNickName();
         ARRtmpcEngine.Inst().initEngine(getApplicationContext(), DeveloperInfo.APPID, DeveloperInfo.APPTOKEN);
-
-
-        InitializationConfig  config = InitializationConfig.newBuilder(this)
-                .connectionTimeout(15*1000)
-                .readTimeout(15*1000)
-                .retry(1).build();
-        NoHttp.initialize(config);
     }
     public  static Application App(){
         return mARApplication;
